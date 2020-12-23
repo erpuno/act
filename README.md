@@ -6,7 +6,7 @@ Actor System library for F# ERP.UNO components.
 Objective
 ---------
 
-14M msgs/sec demo for F# .NET 5.0 target for 8700
+14M msgs/sec demo for F# .NET 5.0 target on 8700 CPU.
 
 ```
 $ time bin/Debug/net5.0/charlie
@@ -20,4 +20,3 @@ Credits
 
 * Igor Gorodetsky
 * Maxim Sokhatsky
-
