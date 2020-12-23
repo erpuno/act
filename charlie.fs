@@ -78,7 +78,6 @@ module SharedActor =
          | GetAndReset reply ->
            reply count
            loop 0L mailbox)
-      loop 0L mailbox
 
   let sharedActor = Start (fun mailbox -> loop 0L mailbox)
 
