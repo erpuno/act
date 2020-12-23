@@ -6,8 +6,8 @@ open System.Collections.Concurrent
 open FSharp
 
 type CounterMsg =
-   | Add of int64
-   | GetAndReset of (int64 -> unit)
+   | Add of int32
+   | GetAndReset of (int32 -> unit)
 
 type 'a ISharedActor =
    abstract Post : msg:'a -> unit
@@ -26,7 +26,7 @@ type 'a SharedMailbox() =
          react currentMessage
          currentMessage <- Unchecked.defaultof<_>
          let newCount = Interlocked.Decrement &msgCount
-         if newCount = 0 then execute false
+         if newCount <> 0 then execute false
 
       if isFirst then consumeAndLoop()
       else
@@ -77,7 +77,22 @@ module SharedActor =
          | Add n -> loop (count + n) mailbox
          | GetAndReset reply ->
            reply count
-           loop 0L mailbox)
+           loop 0 mailbox)
 
-  let sharedActor = Start (fun mailbox -> loop 0L mailbox)
+  let sharedActor = Start (fun mailbox -> loop 0 mailbox)
 
+  let ret (_:unit) = 0
+  let eval args =
+      let mutable u = sharedActor
+      for i in 0 .. 14000000 do
+          u.Post <| Add i
+
+  // 14M msgs/sec demo for F# .NET 5.0 target for 8700
+
+  // $ time bin/Debug/net5.0/charlie
+  // real    0m1.109s
+  // user    0m1.063s
+  // sys     0m0.047s
+
+  [<EntryPoint>]
+  let main args = args |> eval |> ret
